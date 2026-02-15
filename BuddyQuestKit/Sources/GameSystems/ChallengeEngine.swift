@@ -47,6 +47,15 @@ public protocol Challenge: AnyObject {
 
     /// Clean up UI nodes
     func teardown()
+
+    /// Handle a touch/click at a location in the scene (iOS tap-to-select).
+    /// Default implementation does nothing.
+    func handleTouch(at location: CGPoint, in scene: SKScene)
+}
+
+/// Default no-op for challenges that don't (yet) support touch
+extension Challenge {
+    public func handleTouch(at location: CGPoint, in scene: SKScene) {}
 }
 
 // MARK: - Round Challenge Protocol
@@ -299,6 +308,19 @@ public final class ChallengeEngine {
         if let result = challenge.handleInput(input) {
             completeChallenge(with: result)
         }
+    }
+
+    /// Route a touch/click to the active challenge (iOS tap-to-select)
+    public func handleTouch(at location: CGPoint, in scene: SKScene) {
+        guard isActive, !isLoading else { return }
+
+        // If showing result summary, tap anywhere to dismiss
+        if isShowingResult {
+            dismissChallenge()
+            return
+        }
+
+        currentChallenge?.handleTouch(at: location, in: scene)
     }
 
     /// Per-frame update for active challenge
@@ -591,9 +613,13 @@ public final class ChallengeEngine {
             summaryMaxScroll = 0
         }
 
-        // "Press E to continue" hint (bottom of panel)
+        // "Press E to continue" / "Tap to continue" hint (bottom of panel)
         let hint = SKLabelNode(fontNamed: "AvenirNext-Medium")
+        #if os(iOS)
+        hint.text = "Tap to continue"
+        #else
         hint.text = "Press E to continue"
+        #endif
         hint.fontSize = 11
         hint.fontColor = SKColor(white: 0.6, alpha: 1)
         hint.verticalAlignmentMode = .center

@@ -556,26 +556,27 @@ struct VirtualJoystick: View {
                 .fill(Color.white.opacity(0.4))
                 .frame(width: 50, height: 50)
                 .offset(dragOffset)
-                .gesture(
-                    DragGesture()
-                        .onChanged { value in
-                            let maxDist: CGFloat = 35
-                            let x = max(-maxDist, min(maxDist, value.translation.width))
-                            let y = max(-maxDist, min(maxDist, value.translation.height))
-                            dragOffset = CGSize(width: x, height: y)
-
-                            let direction = CGPoint(
-                                x: x / maxDist,
-                                y: -y / maxDist  // Flip Y for SpriteKit
-                            )
-                            inputManager.setVirtualJoystick(direction: direction)
-                        }
-                        .onEnded { _ in
-                            dragOffset = .zero
-                            inputManager.setVirtualJoystick(direction: .zero)
-                        }
-                )
         }
+        .contentShape(Circle())
+        .gesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { value in
+                    let maxDist: CGFloat = 35
+                    let x = max(-maxDist, min(maxDist, value.translation.width))
+                    let y = max(-maxDist, min(maxDist, value.translation.height))
+                    dragOffset = CGSize(width: x, height: y)
+
+                    let direction = CGPoint(
+                        x: x / maxDist,
+                        y: -y / maxDist  // Flip Y for SpriteKit
+                    )
+                    inputManager.setVirtualJoystick(direction: direction)
+                }
+                .onEnded { _ in
+                    dragOffset = .zero
+                    inputManager.setVirtualJoystick(direction: .zero)
+                }
+        )
     }
 }
 

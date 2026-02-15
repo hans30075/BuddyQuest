@@ -365,7 +365,11 @@ public final class MatchingChallenge: Challenge, RoundChallenge {
 
         // Navigation hint
         let navHint = SKLabelNode(fontNamed: "AvenirNext-Medium")
+        #if os(iOS)
+        navHint.text = "Tap left item, then tap right item to match  \u{2022}  Tap Submit"
+        #else
         navHint.text = "\u{2190}\u{2192} Column  \u{2022}  \u{2191}\u{2193} Move  \u{2022}  E Match  \u{2022}  Submit to check"
+        #endif
         navHint.fontSize = 10
         navHint.fontColor = SKColor(white: 0.5, alpha: 1)
         navHint.verticalAlignmentMode = .center
@@ -553,6 +557,81 @@ public final class MatchingChallenge: Challenge, RoundChallenge {
             // Remove second chance overlay if present
             questionContainer?.childNode(withName: "secondChanceOverlay")?.removeFromParent()
             submitCurrentAnswer()
+        }
+    }
+
+    // MARK: - Touch Input (iOS)
+
+    public func handleTouch(at location: CGPoint, in scene: SKScene) {
+        guard !isShowingPerQuestionFeedback, !isComplete else { return }
+        guard let container = questionContainer else { return }
+
+        let localPoint = container.convert(location, from: scene)
+
+        // Check submit button tap
+        if let submitNode = container.childNode(withName: "submitMatches") as? SKShapeNode,
+           submitNode.frame.contains(localPoint) {
+            container.childNode(withName: "secondChanceOverlay")?.removeFromParent()
+            submitCurrentAnswer()
+            return
+        }
+
+        // Check left column taps
+        for i in 0..<currentLeftItems.count {
+            if let node = container.childNode(withName: "leftItem_\(i)") as? SKShapeNode,
+               node.frame.contains(localPoint) {
+                leftFocusIndex = i
+                focusRegion = .leftColumn
+
+                if selectedLeftIndex == i {
+                    // Deselect
+                    selectedLeftIndex = nil
+                } else {
+                    // If already matched, un-match first
+                    if playerMapping[i] != nil {
+                        removeMatch(leftIndex: i)
+                    }
+                    // Select and wait for right column tap
+                    selectedLeftIndex = i
+                }
+                updateAllHighlights()
+                redrawConnectorLines()
+                return
+            }
+        }
+
+        // Check right column taps
+        for i in 0..<currentRightItems.count {
+            if let node = container.childNode(withName: "rightItem_\(i)") as? SKShapeNode,
+               node.frame.contains(localPoint) {
+                rightFocusIndex = i
+                focusRegion = .rightColumn
+
+                if let leftIdx = selectedLeftIndex {
+                    // Un-match any left item already pointing to this right item
+                    for j in 0..<playerMapping.count {
+                        if playerMapping[j] == i {
+                            playerMapping[j] = nil
+                        }
+                    }
+                    // Create the match
+                    playerMapping[leftIdx] = i
+                    selectedLeftIndex = nil
+                    focusRegion = .leftColumn
+                } else {
+                    // No left selected — un-match any item pointing to this right item
+                    for j in 0..<playerMapping.count {
+                        if playerMapping[j] == i {
+                            removeMatch(leftIndex: j)
+                            break
+                        }
+                    }
+                }
+                updateAllHighlights()
+                redrawConnectorLines()
+                updateSubmitButton()
+                return
+            }
         }
     }
 

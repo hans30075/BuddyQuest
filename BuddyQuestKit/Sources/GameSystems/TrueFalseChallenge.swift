@@ -241,7 +241,11 @@ public final class TrueFalseChallenge: Challenge, RoundChallenge {
 
         // Navigation hint
         let navHint = SKLabelNode(fontNamed: "AvenirNext-Medium")
+        #if os(iOS)
+        navHint.text = "Tap True or False"
+        #else
         navHint.text = "\u{2191}\u{2193} Select  \u{2022}  E/Enter Confirm"
+        #endif
         navHint.fontSize = 10
         navHint.fontColor = SKColor(white: 0.5, alpha: 1)
         navHint.verticalAlignmentMode = .center
@@ -303,6 +307,26 @@ public final class TrueFalseChallenge: Challenge, RoundChallenge {
         }
 
         return nil
+    }
+
+    // MARK: - Touch Input (iOS)
+
+    public func handleTouch(at location: CGPoint, in scene: SKScene) {
+        guard !isShowingPerQuestionFeedback, !isComplete else { return }
+        guard let container = questionContainer else { return }
+
+        for i in 0..<2 {
+            if let optionNode = container.childNode(withName: "option_\(i)") as? SKShapeNode {
+                let localPoint = container.convert(location, from: scene)
+                if optionNode.frame.contains(localPoint) {
+                    selectedIndex = i
+                    updateOptionHighlight()
+                    container.childNode(withName: "secondChanceOverlay")?.removeFromParent()
+                    submitCurrentAnswer()
+                    return
+                }
+            }
+        }
     }
 
     // MARK: - Update

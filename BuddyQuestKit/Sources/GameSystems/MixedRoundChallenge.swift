@@ -101,6 +101,13 @@ public final class MixedRoundChallenge: Challenge, RoundChallenge {
         return nil
     }
 
+    // MARK: - Touch Input (iOS)
+
+    public func handleTouch(at location: CGPoint, in scene: SKScene) {
+        guard !isComplete else { return }
+        currentSubChallenge?.handleTouch(at: location, in: scene)
+    }
+
     // MARK: - Update
 
     public func update(deltaTime: TimeInterval) {

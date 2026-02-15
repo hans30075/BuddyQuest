@@ -314,7 +314,11 @@ public final class OrderingChallenge: Challenge, RoundChallenge {
 
         // Navigation hint
         let navHint = SKLabelNode(fontNamed: "AvenirNext-Medium")
+        #if os(iOS)
+        navHint.text = "Tap item to grab  \u{2022}  Tap position to move  \u{2022}  Tap Submit"
+        #else
         navHint.text = "\u{2191}\u{2193} Move  \u{2022}  E Grab/Drop  \u{2022}  Submit to check"
+        #endif
         navHint.fontSize = 10
         navHint.fontColor = SKColor(white: 0.5, alpha: 1)
         navHint.verticalAlignmentMode = .center
@@ -446,6 +450,65 @@ public final class OrderingChallenge: Challenge, RoundChallenge {
             // Remove second chance overlay if present
             questionContainer?.childNode(withName: "secondChanceOverlay")?.removeFromParent()
             submitCurrentAnswer()
+        }
+    }
+
+    // MARK: - Touch Input (iOS)
+
+    public func handleTouch(at location: CGPoint, in scene: SKScene) {
+        guard !isShowingPerQuestionFeedback, !isComplete else { return }
+        guard let container = questionContainer else { return }
+
+        let localPoint = container.convert(location, from: scene)
+
+        // Check submit button tap
+        if let submitNode = container.childNode(withName: "submitOrder") as? SKShapeNode,
+           submitNode.frame.contains(localPoint) {
+            container.childNode(withName: "secondChanceOverlay")?.removeFromParent()
+            submitCurrentAnswer()
+            return
+        }
+
+        // Check item taps
+        for i in 0..<currentItems.count {
+            if let itemNode = container.childNode(withName: "orderItem_\(i)") as? SKShapeNode,
+               itemNode.frame.contains(localPoint) {
+                switch orderingState {
+                case .navigating:
+                    // Tap an item to grab it
+                    focusedIndex = i
+                    orderingState = .grabbed(index: i)
+                    updateItemHighlights()
+                case .grabbed(let grabbedIndex):
+                    if grabbedIndex == i {
+                        // Tap same item to drop it
+                        orderingState = .navigating
+                        updateItemHighlights()
+                    } else {
+                        // Tap a different item: move grabbed item to that position
+                        // Perform sequential swaps to move grabbedIndex towards i
+                        let step = grabbedIndex < i ? 1 : -1
+                        var current = grabbedIndex
+                        while current != i {
+                            let next = current + step
+                            swapItems(at: current, with: next)
+                            current = next
+                        }
+                        focusedIndex = i
+                        hasMadeMove = true
+                        orderingState = .navigating
+                        updateItemHighlights()
+                        updateSubmitButton()
+                    }
+                case .submitFocused:
+                    // Tap item while submit focused — go back to navigating
+                    focusedIndex = i
+                    orderingState = .navigating
+                    updateItemHighlights()
+                    updateSubmitButton()
+                }
+                return
+            }
         }
     }
 

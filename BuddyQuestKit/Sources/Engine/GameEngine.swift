@@ -1454,6 +1454,12 @@ public final class GameEngine: SKScene {
             }
             return
         }
+
+        // Route click to active challenge (click-to-select answer options)
+        if challengeEngine.isActive {
+            challengeEngine.handleTouch(at: location, in: self)
+            return
+        }
     }
     #endif
 
@@ -1482,48 +1488,21 @@ public final class GameEngine: SKScene {
             return
         }
 
-        handleTouch(at: location, phase: .began)
-    }
-
-    public override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else { return }
-        let location = touch.location(in: self)
-        handleTouch(at: location, phase: .moved)
-    }
-
-    public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        inputManager.setVirtualJoystick(direction: .zero)
-    }
-
-    public override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        inputManager.setVirtualJoystick(direction: .zero)
-    }
-
-    private enum TouchPhase { case began, moved }
-
-    private func handleTouch(at location: CGPoint, phase: TouchPhase) {
-        // Left half of screen: joystick
-        // Right half of screen: interact button
-        let screenCenter = CGPoint.zero // Camera-relative
-
-        if location.x < screenCenter.x {
-            // Virtual joystick - calculate direction from bottom-left area
-            let joystickCenter = CGPoint(
-                x: -size.width / 2 + 80,
-                y: -size.height / 2 + 80
-            )
-            let diff = location - joystickCenter
-            let maxDist: CGFloat = 60
-            let clamped = CGPoint(
-                x: max(-1, min(1, diff.x / maxDist)),
-                y: max(-1, min(1, diff.y / maxDist))
-            )
-            inputManager.setVirtualJoystick(direction: clamped)
-        } else if phase == .began {
-            // Tap right side = interact
-            inputManager.pressVirtualButton(.interact)
+        // Route touch to active challenge (tap-to-select answer options)
+        if challengeEngine.isActive {
+            challengeEngine.handleTouch(at: location, in: self)
+            return
         }
+
+        // NOTE: Joystick + action buttons are handled by the SwiftUI
+        // VirtualControlsOverlay (GameContainerView).  We intentionally
+        // do NOT call handleTouch/setVirtualJoystick here so the two
+        // input paths don't fight each other.
     }
+
+    // touchesMoved / touchesEnded / touchesCancelled are intentionally
+    // not overridden — the SwiftUI VirtualControlsOverlay owns joystick
+    // state and will call inputManager.setVirtualJoystick directly.
     #endif
 
     // MARK: - Window Resize

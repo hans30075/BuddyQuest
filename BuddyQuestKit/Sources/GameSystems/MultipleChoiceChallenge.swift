@@ -288,7 +288,11 @@ public final class MultipleChoiceChallenge: Challenge, RoundChallenge {
 
         // Navigation hint
         let navHint = SKLabelNode(fontNamed: "AvenirNext-Medium")
+        #if os(iOS)
+        navHint.text = "Tap an answer to select"
+        #else
         navHint.text = "↑↓ Navigate  •  E/Enter Confirm"
+        #endif
         navHint.fontSize = 10
         navHint.fontColor = SKColor(white: 0.5, alpha: 1)
         navHint.verticalAlignmentMode = .center
@@ -350,6 +354,29 @@ public final class MultipleChoiceChallenge: Challenge, RoundChallenge {
         }
 
         return nil
+    }
+
+    // MARK: - Touch Input (iOS)
+
+    public func handleTouch(at location: CGPoint, in scene: SKScene) {
+        guard !isShowingPerQuestionFeedback, !isComplete else { return }
+        guard let container = questionContainer else { return }
+
+        let optionCount = questions[currentIndex].options.count
+        for i in 0..<optionCount {
+            if let optionNode = container.childNode(withName: "option_\(i)") as? SKShapeNode {
+                // Convert touch location to the container's coordinate space
+                let localPoint = container.convert(location, from: scene)
+                if optionNode.frame.contains(localPoint) {
+                    selectedIndex = i
+                    updateOptionHighlight()
+                    // Remove second chance overlay if present
+                    container.childNode(withName: "secondChanceOverlay")?.removeFromParent()
+                    submitCurrentAnswer()
+                    return
+                }
+            }
+        }
     }
 
     // MARK: - Update
