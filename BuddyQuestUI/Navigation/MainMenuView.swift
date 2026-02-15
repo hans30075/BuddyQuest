@@ -74,9 +74,14 @@ public struct MainMenuView: View {
                                     .fill(profileColor)
                                     .frame(width: 32, height: 32)
                                     .shadow(color: profileColor.opacity(0.5), radius: 4)
-                                Text(profile.initial)
-                                    .font(.system(size: 14, weight: .bold, design: .rounded))
-                                    .foregroundColor(.white)
+                                if profile.avatarEmoji != nil {
+                                    Text(profile.avatarDisplay)
+                                        .font(.system(size: 18))
+                                } else {
+                                    Text(profile.avatarDisplay)
+                                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                                        .foregroundColor(.white)
+                                }
                             }
                             Text("Playing as \(profile.name)")
                                 .font(.system(size: 14, weight: .semibold, design: .rounded))

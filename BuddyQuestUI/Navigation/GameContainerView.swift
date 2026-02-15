@@ -219,9 +219,14 @@ struct ProfileSheet: View {
                             .fill(profileColor)
                             .frame(width: 40, height: 40)
                             .shadow(color: profileColor.opacity(0.4), radius: 4)
-                        Text(profile.initial)
-                            .font(.system(size: 18, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
+                        if profile.avatarEmoji != nil {
+                            Text(profile.avatarDisplay)
+                                .font(.system(size: 22))
+                        } else {
+                            Text(profile.avatarDisplay)
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                                .foregroundColor(.white)
+                        }
                     }
 
                     // Name + grade

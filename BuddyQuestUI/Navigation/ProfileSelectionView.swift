@@ -122,9 +122,14 @@ struct ProfileSelectionView: View {
                         .frame(width: 80, height: 80)
                         .shadow(color: color.opacity(0.4), radius: 8)
 
-                    Text(profile.initial)
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
+                    if profile.avatarEmoji != nil {
+                        Text(profile.avatarDisplay)
+                            .font(.system(size: 40))
+                    } else {
+                        Text(profile.avatarDisplay)
+                            .font(.system(size: 32, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                    }
                 }
 
                 // Name

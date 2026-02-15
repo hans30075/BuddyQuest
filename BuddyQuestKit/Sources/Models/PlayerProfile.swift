@@ -44,17 +44,23 @@ public struct PlayerProfile: Codable, Identifiable, Equatable, Sendable {
     public var gradeLevel: GradeLevel
     public var createdDate: Date
 
+    /// Optional emoji shown on the avatar circle instead of the name initial.
+    /// When nil, the avatar displays the first letter of the name.
+    public var avatarEmoji: String?
+
     public init(
         id: UUID = UUID(),
         name: String,
         color: ProfileColor,
         gradeLevel: GradeLevel,
+        avatarEmoji: String? = nil,
         createdDate: Date = Date()
     ) {
         self.id = id
         self.name = name
         self.color = color
         self.gradeLevel = gradeLevel
+        self.avatarEmoji = avatarEmoji
         self.createdDate = createdDate
     }
 
@@ -62,4 +68,24 @@ public struct PlayerProfile: Codable, Identifiable, Equatable, Sendable {
     public var initial: String {
         String(name.prefix(1)).uppercased()
     }
+
+    /// The text to display on the avatar badge — emoji if set, otherwise the initial.
+    public var avatarDisplay: String {
+        avatarEmoji ?? initial
+    }
+}
+
+// MARK: - Avatar Emoji Palette
+
+/// A curated set of fun, kid-friendly emoji for profile avatars.
+public enum AvatarEmoji {
+    public static let all: [String] = [
+        // Animals
+        "🐶", "🐱", "🐰", "🦊", "🐼", "🐨", "🦁", "🐯",
+        "🐸", "🐵", "🦄", "🐙", "🦋", "🐢", "🐬", "🦖",
+        // Faces & people
+        "😎", "🤩", "🥳", "😊", "🤓", "🧑‍🚀", "🧑‍🎨", "🧙",
+        // Objects & nature
+        "⭐", "🌈", "🔥", "💎", "🚀", "🎮", "🎨", "🌻",
+    ]
 }

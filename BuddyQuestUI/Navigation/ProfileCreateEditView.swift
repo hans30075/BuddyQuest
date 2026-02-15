@@ -13,6 +13,7 @@ struct ProfileCreateEditView: View {
     @State private var name: String = ""
     @State private var selectedColor: ProfileColor = .blue
     @State private var selectedGrade: GradeLevel = .third
+    @State private var selectedEmoji: String? = nil
 
     private var isEditing: Bool { existingProfile != nil }
     private var isValid: Bool { !name.trimmingCharacters(in: .whitespaces).isEmpty }
@@ -57,6 +58,57 @@ struct ProfileCreateEditView: View {
                             }
                     }
 
+                    // ── Profile Picture ──
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("PROFILE PICTURE")
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .foregroundColor(.secondary)
+                            .tracking(0.5)
+
+                        // "Use initial" option + emoji grid
+                        LazyVGrid(columns: Array(repeating: GridItem(.fixed(38), spacing: 6), count: 9), spacing: 6) {
+                            // First cell: use name initial (no emoji)
+                            Button {
+                                selectedEmoji = nil
+                            } label: {
+                                let initial = String(name.trimmingCharacters(in: .whitespaces).prefix(1)).uppercased()
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(selectedEmoji == nil ? profileSwiftUIColor(selectedColor).opacity(0.2) : Color.primary.opacity(0.06))
+                                    Text(initial.isEmpty ? "A" : initial)
+                                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                                        .foregroundColor(selectedEmoji == nil ? profileSwiftUIColor(selectedColor) : .secondary)
+                                }
+                                .frame(width: 38, height: 38)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .strokeBorder(selectedEmoji == nil ? profileSwiftUIColor(selectedColor) : Color.clear, lineWidth: 2)
+                                )
+                            }
+                            .buttonStyle(.plain)
+
+                            // Emoji options
+                            ForEach(AvatarEmoji.all, id: \.self) { emoji in
+                                Button {
+                                    selectedEmoji = emoji
+                                } label: {
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(selectedEmoji == emoji ? profileSwiftUIColor(selectedColor).opacity(0.2) : Color.primary.opacity(0.06))
+                                        Text(emoji)
+                                            .font(.system(size: 20))
+                                    }
+                                    .frame(width: 38, height: 38)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .strokeBorder(selectedEmoji == emoji ? profileSwiftUIColor(selectedColor) : Color.clear, lineWidth: 2)
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+
                     // ── Avatar Color ──
                     VStack(alignment: .leading, spacing: 8) {
                         Text("AVATAR COLOR")
@@ -94,7 +146,7 @@ struct ProfileCreateEditView: View {
                     // ── Preview ──
                     if isValid {
                         HStack(spacing: 12) {
-                            profileAvatar(name: name, color: selectedColor, size: 50)
+                            profileAvatar(name: name, color: selectedColor, emoji: selectedEmoji, size: 50)
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(name.trimmingCharacters(in: .whitespaces))
@@ -141,6 +193,7 @@ struct ProfileCreateEditView: View {
                 name = profile.name
                 selectedColor = profile.color
                 selectedGrade = profile.gradeLevel
+                selectedEmoji = profile.avatarEmoji
             }
         }
     }
@@ -195,15 +248,20 @@ struct ProfileCreateEditView: View {
     // MARK: - Avatar Preview
 
     @ViewBuilder
-    private func profileAvatar(name: String, color: ProfileColor, size: CGFloat) -> some View {
+    private func profileAvatar(name: String, color: ProfileColor, emoji: String?, size: CGFloat) -> some View {
         let initial = String(name.trimmingCharacters(in: .whitespaces).prefix(1)).uppercased()
         ZStack {
             Circle()
                 .fill(profileSwiftUIColor(color))
                 .frame(width: size, height: size)
-            Text(initial.isEmpty ? "?" : initial)
-                .font(.system(size: size * 0.4, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
+            if let emoji = emoji {
+                Text(emoji)
+                    .font(.system(size: size * 0.5))
+            } else {
+                Text(initial.isEmpty ? "?" : initial)
+                    .font(.system(size: size * 0.4, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+            }
         }
     }
 
@@ -218,12 +276,14 @@ struct ProfileCreateEditView: View {
             updated.name = trimmedName
             updated.color = selectedColor
             updated.gradeLevel = selectedGrade
+            updated.avatarEmoji = selectedEmoji
             profileManager.updateProfile(updated)
         } else {
             let profile = PlayerProfile(
                 name: trimmedName,
                 color: selectedColor,
-                gradeLevel: selectedGrade
+                gradeLevel: selectedGrade,
+                avatarEmoji: selectedEmoji
             )
             profileManager.createProfile(profile)
         }

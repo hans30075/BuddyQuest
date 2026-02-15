@@ -868,11 +868,13 @@ public final class GameEngine: SKScene {
         let centerX = (playerX + buddyX) / 2
         let anchorY = -visibleHeight / 2 + 46
 
-        // Profile initial inside badge (or level number if no profile)
+        // Profile avatar inside badge (emoji or initial, or level number if no profile)
         if let profile = ProfileManager.shared.activeProfile {
-            levelLabel.text = profile.initial
+            levelLabel.text = profile.avatarDisplay
+            levelLabel.fontSize = profile.avatarEmoji != nil ? 18 : 14
         } else {
             levelLabel.text = "\(player.level)"
+            levelLabel.fontSize = 14
         }
 
         // Level label above XP bar
