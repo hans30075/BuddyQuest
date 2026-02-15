@@ -174,22 +174,6 @@ public struct MainMenuView: View {
                     }
                     .buttonStyle(.plain)
 
-                    Button {
-                        onSwitchProfile()
-                    } label: {
-                        HStack {
-                            Image(systemName: "person.2.fill")
-                            Text("Switch Player")
-                        }
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        .foregroundColor(.white.opacity(0.8))
-                        .frame(width: 200, height: 44)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white.opacity(0.15))
-                        )
-                    }
-                    .buttonStyle(.plain)
                 }
 
                 Spacer()
@@ -214,7 +198,7 @@ public struct MainMenuView: View {
             SettingsPlaceholderView()
         }
         .sheet(isPresented: $showProfile) {
-            MainMenuProfileSheet()
+            MainMenuProfileSheet(onSwitchProfile: onSwitchProfile)
         }
     }
 }
@@ -402,6 +386,8 @@ struct MainMenuProfileSheet: View {
     @ObservedObject private var profileManager = ProfileManager.shared
     @State private var showEditSheet = false
 
+    let onSwitchProfile: () -> Void
+
     var body: some View {
         VStack(spacing: 0) {
             // Header
@@ -489,6 +475,33 @@ struct MainMenuProfileSheet: View {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(Color.yellow.opacity(0.08))
                         )
+
+                        // Switch Player button
+                        Button {
+                            dismiss()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                onSwitchProfile()
+                            }
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "person.2.fill")
+                                    .font(.system(size: 14))
+                                Text("Switch Player")
+                                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.accentColor.opacity(0.1))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .strokeBorder(Color.accentColor.opacity(0.3), lineWidth: 1)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.top, 4)
                     }
                 }
                 .padding(20)
