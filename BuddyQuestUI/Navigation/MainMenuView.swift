@@ -198,7 +198,16 @@ public struct MainMenuView: View {
             SettingsPlaceholderView()
         }
         .sheet(isPresented: $showProfile) {
-            MainMenuProfileSheet(onSwitchProfile: onSwitchProfile)
+            ProfileSheet(
+                scene: nil,
+                isInGame: false,
+                onSwitchPlayer: {
+                    showProfile = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        onSwitchProfile()
+                    }
+                }
+            )
         }
     }
 }
@@ -376,165 +385,6 @@ struct StarFieldView: View {
                     .opacity(Double.random(in: 0.3...0.8))
             }
         }
-    }
-}
-
-// MARK: - Main Menu Profile Sheet
-
-struct MainMenuProfileSheet: View {
-    @Environment(\.dismiss) private var dismiss
-    @ObservedObject private var profileManager = ProfileManager.shared
-    @State private var showEditSheet = false
-
-    let onSwitchProfile: () -> Void
-
-    var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            HStack {
-                Text("My Profile")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                Spacer()
-                Button("Done") { dismiss() }
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.small)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
-
-            Divider()
-
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Profile card
-                    if let profile = profileManager.activeProfile {
-                        let rgb = profile.color.rgb
-                        let profileColor = Color(red: rgb.r, green: rgb.g, blue: rgb.b)
-
-                        VStack(spacing: 12) {
-                            ZStack {
-                                Circle()
-                                    .fill(profileColor)
-                                    .frame(width: 72, height: 72)
-                                    .shadow(color: profileColor.opacity(0.5), radius: 8)
-                                Text(profile.initial)
-                                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                                    .foregroundColor(.white)
-                            }
-                            Text(profile.name)
-                                .font(.system(size: 24, weight: .bold, design: .rounded))
-
-                            // Grade level with edit button
-                            HStack(spacing: 8) {
-                                Text(profile.gradeLevel.displayName)
-                                    .font(.system(size: 15, design: .rounded))
-                                    .foregroundColor(.secondary)
-
-                                Button {
-                                    showEditSheet = true
-                                } label: {
-                                    HStack(spacing: 4) {
-                                        Image(systemName: "pencil.circle.fill")
-                                        Text("Edit Profile")
-                                    }
-                                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                                }
-                                .buttonStyle(.bordered)
-                                .controlSize(.small)
-                            }
-                        }
-                        .padding(.top, 12)
-
-                        // Info section
-                        VStack(spacing: 12) {
-                            profileInfoRow(
-                                icon: "calendar",
-                                label: "Playing Since",
-                                value: profile.createdDate.formatted(date: .abbreviated, time: .omitted)
-                            )
-                            profileInfoRow(
-                                icon: "graduationcap.fill",
-                                label: "Grade Level",
-                                value: profile.gradeLevel.displayName
-                            )
-                        }
-                        .padding(.top, 8)
-
-                        // Tip about grade changes
-                        HStack(spacing: 8) {
-                            Image(systemName: "lightbulb.fill")
-                                .foregroundColor(.yellow)
-                                .font(.system(size: 14))
-                            Text("Moving up a grade? Tap \"Edit Profile\" to update your grade level. Questions will adjust to match!")
-                                .font(.system(size: 12, design: .rounded))
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.yellow.opacity(0.08))
-                        )
-
-                        // Switch Player button
-                        Button {
-                            dismiss()
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                onSwitchProfile()
-                            }
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: "person.2.fill")
-                                    .font(.system(size: 14))
-                                Text("Switch Player")
-                                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color.accentColor.opacity(0.1))
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .strokeBorder(Color.accentColor.opacity(0.3), lineWidth: 1)
-                            )
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.top, 4)
-                    }
-                }
-                .padding(20)
-            }
-        }
-        .frame(minWidth: 400, minHeight: 380)
-        .sheet(isPresented: $showEditSheet) {
-            if let profile = profileManager.activeProfile {
-                ProfileCreateEditView(existingProfile: profile)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func profileInfoRow(icon: String, label: String, value: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 14))
-                .foregroundColor(.secondary)
-                .frame(width: 20)
-            Text(label)
-                .font(.system(size: 14, design: .rounded))
-                .foregroundColor(.secondary)
-            Spacer()
-            Text(value)
-                .font(.system(size: 14, weight: .medium, design: .rounded))
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.primary.opacity(0.04))
-        )
     }
 }
 

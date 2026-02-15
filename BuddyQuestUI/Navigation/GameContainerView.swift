@@ -47,7 +47,7 @@ public struct GameContainerView: View {
             viewModel.resume()
         }) {
             if let scene = viewModel.currentScene {
-                InGameProfileSheet(
+                ProfileSheet(
                     scene: scene,
                     isInGame: true,
                     onSwitchPlayer: {
@@ -180,19 +180,29 @@ struct GameMenuButtonStyle: ButtonStyle {
     }
 }
 
-// MARK: - In-Game Profile Sheet
+// MARK: - Unified Profile Sheet
+//
+// Used from both the main menu ("Playing as …" banner) and the in-game
+// pause screen.  When `scene` is provided, Level & XP and Subject
+// Performance sections are shown.  When `isInGame` is true, the top-right
+// button says "Resume" and Quit / Switch Player actions appear at the bottom.
 
-struct InGameProfileSheet: View {
+struct ProfileSheet: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var profileManager = ProfileManager.shared
     @State private var showEditSheet = false
-    let scene: GameEngine
 
-    /// Whether this sheet is shown from within the game (shows game actions)
-    var isInGame: Bool = false
+    /// Optional game scene — when provided, game stats (Level & XP, Subject Performance) are shown.
+    let scene: GameEngine?
 
-    /// Game action callbacks (only used when isInGame == true)
+    /// Whether this sheet is presented from within the game.
+    /// Controls the top-right button label ("Resume" vs "Done") and shows game actions.
+    let isInGame: Bool
+
+    /// Callback to switch to a different player profile.
     var onSwitchPlayer: (() -> Void)?
+
+    /// Callback to quit the game and return to the main menu (in-game only).
     var onQuit: (() -> Void)?
 
     var body: some View {
@@ -215,7 +225,7 @@ struct InGameProfileSheet: View {
 
             ScrollView {
                 VStack(spacing: 20) {
-                    // Profile card
+                    // ── Profile Card ──
                     if let profile = profileManager.activeProfile {
                         let rgb = profile.color.rgb
                         let profileColor = Color(red: rgb.r, green: rgb.g, blue: rgb.b)
@@ -243,7 +253,7 @@ struct InGameProfileSheet: View {
                                 } label: {
                                     HStack(spacing: 4) {
                                         Image(systemName: "pencil.circle.fill")
-                                        Text("Edit")
+                                        Text("Edit Profile")
                                     }
                                     .font(.system(size: 11, weight: .medium, design: .rounded))
                                 }
@@ -252,62 +262,96 @@ struct InGameProfileSheet: View {
                             }
                         }
                         .padding(.top, 8)
-                    }
 
-                    // Level & XP
-                    VStack(spacing: 8) {
-                        sectionHeader("Level & XP")
-
-                        HStack(spacing: 20) {
-                            statBox(
-                                label: "Level",
-                                value: "\(scene.player.level)",
-                                icon: "star.fill",
-                                color: .yellow
+                        // ── Info Section (always shown) ──
+                        VStack(spacing: 12) {
+                            profileInfoRow(
+                                icon: "calendar",
+                                label: "Playing Since",
+                                value: profile.createdDate.formatted(date: .abbreviated, time: .omitted)
                             )
-                            statBox(
-                                label: "Total XP",
-                                value: "\(scene.player.totalXP)",
-                                icon: "bolt.fill",
-                                color: .orange
-                            )
-                            statBox(
-                                label: "Next Level",
-                                value: "\(GameConstants.xpPerLevel - scene.player.xpForCurrentLevel) XP",
-                                icon: "arrow.up.circle.fill",
-                                color: .green
+                            profileInfoRow(
+                                icon: "graduationcap.fill",
+                                label: "Grade Level",
+                                value: profile.gradeLevel.displayName
                             )
                         }
+                        .padding(.top, 8)
                     }
 
-                    // Subject Performance
-                    VStack(spacing: 8) {
-                        sectionHeader("Subject Performance")
-
-                        ForEach(BuddyQuestKit.Subject.allCases, id: \.rawValue) { subject in
-                            subjectRow(subject)
-                        }
-                    }
-
-                    // Game actions (only in-game)
-                    if isInGame {
-                        Divider()
-                            .padding(.horizontal, -20)
-
+                    // ── Level & XP (in-game only) ──
+                    if let scene = scene {
                         VStack(spacing: 8) {
-                            Button {
-                                onSwitchPlayer?()
-                            } label: {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "person.2.fill")
-                                    Text("Switch Player")
-                                }
-                            }
-                            .buttonStyle(GameMenuButtonStyle(
-                                foreground: Color(red: 0.3, green: 0.5, blue: 0.8),
-                                background: Color(red: 0.3, green: 0.5, blue: 0.8).opacity(0.1)
-                            ))
+                            sectionHeader("Level & XP")
 
+                            HStack(spacing: 20) {
+                                statBox(
+                                    label: "Level",
+                                    value: "\(scene.player.level)",
+                                    icon: "star.fill",
+                                    color: .yellow
+                                )
+                                statBox(
+                                    label: "Total XP",
+                                    value: "\(scene.player.totalXP)",
+                                    icon: "bolt.fill",
+                                    color: .orange
+                                )
+                                statBox(
+                                    label: "Next Level",
+                                    value: "\(GameConstants.xpPerLevel - scene.player.xpForCurrentLevel) XP",
+                                    icon: "arrow.up.circle.fill",
+                                    color: .green
+                                )
+                            }
+                        }
+
+                        // ── Subject Performance (in-game only) ──
+                        VStack(spacing: 8) {
+                            sectionHeader("Subject Performance")
+
+                            ForEach(BuddyQuestKit.Subject.allCases, id: \.rawValue) { subject in
+                                subjectRow(subject, scene: scene)
+                            }
+                        }
+                    }
+
+                    // ── Tip (always shown) ──
+                    HStack(spacing: 8) {
+                        Image(systemName: "lightbulb.fill")
+                            .foregroundColor(.yellow)
+                            .font(.system(size: 14))
+                        Text("Moving up a grade? Tap \"Edit Profile\" to update your grade level. Questions will adjust to match!")
+                            .font(.system(size: 12, design: .rounded))
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.yellow.opacity(0.08))
+                    )
+
+                    // ── Actions ──
+                    Divider()
+                        .padding(.horizontal, -20)
+
+                    VStack(spacing: 8) {
+                        // Switch Player (always available)
+                        Button {
+                            onSwitchPlayer?()
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "person.2.fill")
+                                Text("Switch Player")
+                            }
+                        }
+                        .buttonStyle(GameMenuButtonStyle(
+                            foreground: Color(red: 0.3, green: 0.5, blue: 0.8),
+                            background: Color(red: 0.3, green: 0.5, blue: 0.8).opacity(0.1)
+                        ))
+
+                        // Quit to Menu (in-game only)
+                        if isInGame {
                             Button {
                                 onQuit?()
                             } label: {
@@ -326,7 +370,7 @@ struct InGameProfileSheet: View {
                 .padding(20)
             }
         }
-        .frame(minWidth: 400, minHeight: isInGame ? 520 : 420)
+        .frame(minWidth: 400, minHeight: isInGame ? 560 : 440)
         .sheet(isPresented: $showEditSheet) {
             if let profile = profileManager.activeProfile {
                 ProfileCreateEditView(existingProfile: profile)
@@ -335,6 +379,28 @@ struct InGameProfileSheet: View {
     }
 
     // MARK: - Helpers
+
+    @ViewBuilder
+    private func profileInfoRow(icon: String, label: String, value: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14))
+                .foregroundColor(.secondary)
+                .frame(width: 20)
+            Text(label)
+                .font(.system(size: 14, design: .rounded))
+                .foregroundColor(.secondary)
+            Spacer()
+            Text(value)
+                .font(.system(size: 14, weight: .medium, design: .rounded))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.primary.opacity(0.04))
+        )
+    }
 
     @ViewBuilder
     private func sectionHeader(_ title: String) -> some View {
@@ -368,7 +434,7 @@ struct InGameProfileSheet: View {
     }
 
     @ViewBuilder
-    private func subjectRow(_ subject: BuddyQuestKit.Subject) -> some View {
+    private func subjectRow(_ subject: BuddyQuestKit.Subject, scene: GameEngine) -> some View {
         let completed = scene.progressionSystem.subjectCompletedCount[subject] ?? 0
         let correct = scene.progressionSystem.subjectCorrectCount[subject] ?? 0
         let accuracy = completed > 0 ? Double(correct) / Double(completed) : 0
