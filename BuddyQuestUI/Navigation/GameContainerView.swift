@@ -207,84 +207,121 @@ struct ProfileSheet: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Header
-            HStack {
-                Text("My Profile")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                Spacer()
-                Button(isInGame ? "Resume" : "Done") { dismiss() }
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .buttonStyle(.borderedProminent)
-                    .tint(isInGame ? .green : .accentColor)
-                    .controlSize(.small)
+            // ── Compact Header: avatar + name + actions ──
+            if let profile = profileManager.activeProfile {
+                let rgb = profile.color.rgb
+                let profileColor = Color(red: rgb.r, green: rgb.g, blue: rgb.b)
+
+                HStack(spacing: 12) {
+                    // Avatar
+                    ZStack {
+                        Circle()
+                            .fill(profileColor)
+                            .frame(width: 40, height: 40)
+                            .shadow(color: profileColor.opacity(0.4), radius: 4)
+                        Text(profile.initial)
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                    }
+
+                    // Name + grade
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(profile.name)
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                        Text(profile.gradeLevel.displayName)
+                            .font(.system(size: 12, design: .rounded))
+                            .foregroundColor(.secondary)
+                    }
+
+                    Spacer()
+
+                    // Action buttons
+                    HStack(spacing: 6) {
+                        Button {
+                            showEditSheet = true
+                        } label: {
+                            HStack(spacing: 3) {
+                                Image(systemName: "pencil")
+                                Text("Edit")
+                            }
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.mini)
+
+                        Button {
+                            onSwitchPlayer?()
+                        } label: {
+                            HStack(spacing: 3) {
+                                Image(systemName: "person.2")
+                                Text("Switch")
+                            }
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.mini)
+
+                        if isInGame {
+                            Button {
+                                onQuit?()
+                            } label: {
+                                HStack(spacing: 3) {
+                                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                                    Text("Quit")
+                                }
+                                .font(.system(size: 11, weight: .medium, design: .rounded))
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.mini)
+                            .tint(.red)
+                        }
+                    }
+
+                    // Resume / Done
+                    Button(isInGame ? "Resume" : "Done") { dismiss() }
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .buttonStyle(.borderedProminent)
+                        .tint(isInGame ? .green : .accentColor)
+                        .controlSize(.small)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+            } else {
+                // Fallback if no profile
+                HStack {
+                    Text("My Profile")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                    Spacer()
+                    Button(isInGame ? "Resume" : "Done") { dismiss() }
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.small)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
 
             Divider()
 
             ScrollView {
-                VStack(spacing: 20) {
-                    // ── Profile Card ──
+                VStack(spacing: 14) {
+                    // ── Info Row ──
                     if let profile = profileManager.activeProfile {
-                        let rgb = profile.color.rgb
-                        let profileColor = Color(red: rgb.r, green: rgb.g, blue: rgb.b)
-
-                        VStack(spacing: 12) {
-                            ZStack {
-                                Circle()
-                                    .fill(profileColor)
-                                    .frame(width: 64, height: 64)
-                                    .shadow(color: profileColor.opacity(0.5), radius: 8)
-                                Text(profile.initial)
-                                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                                    .foregroundColor(.white)
-                            }
-                            Text(profile.name)
-                                .font(.system(size: 22, weight: .bold, design: .rounded))
-
-                            HStack(spacing: 8) {
-                                Text(profile.gradeLevel.displayName)
-                                    .font(.system(size: 14, design: .rounded))
-                                    .foregroundColor(.secondary)
-
-                                Button {
-                                    showEditSheet = true
-                                } label: {
-                                    HStack(spacing: 4) {
-                                        Image(systemName: "pencil.circle.fill")
-                                        Text("Edit Profile")
-                                    }
-                                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                                }
-                                .buttonStyle(.bordered)
-                                .controlSize(.mini)
-                            }
-                        }
-                        .padding(.top, 8)
-
-                        // ── Info Section (always shown) ──
-                        VStack(spacing: 12) {
+                        HStack(spacing: 0) {
                             profileInfoRow(
                                 icon: "calendar",
-                                label: "Playing Since",
+                                label: "Since",
                                 value: profile.createdDate.formatted(date: .abbreviated, time: .omitted)
                             )
-                            profileInfoRow(
-                                icon: "graduationcap.fill",
-                                label: "Grade Level",
-                                value: profile.gradeLevel.displayName
-                            )
                         }
-                        .padding(.top, 8)
                     }
 
                     // ── Level & XP (in-game only) ──
                     if let scene = scene {
-                        VStack(spacing: 8) {
+                        VStack(spacing: 6) {
                             sectionHeader("Level & XP")
 
-                            HStack(spacing: 20) {
+                            HStack(spacing: 12) {
                                 statBox(
                                     label: "Level",
                                     value: "\(scene.player.level)",
@@ -307,7 +344,7 @@ struct ProfileSheet: View {
                         }
 
                         // ── Subject Performance (in-game only) ──
-                        VStack(spacing: 8) {
+                        VStack(spacing: 6) {
                             sectionHeader("Subject Performance")
 
                             ForEach(BuddyQuestKit.Subject.allCases, id: \.rawValue) { subject in
@@ -316,61 +353,25 @@ struct ProfileSheet: View {
                         }
                     }
 
-                    // ── Tip (always shown) ──
+                    // ── Tip ──
                     HStack(spacing: 8) {
                         Image(systemName: "lightbulb.fill")
                             .foregroundColor(.yellow)
-                            .font(.system(size: 14))
-                        Text("Moving up a grade? Tap \"Edit Profile\" to update your grade level. Questions will adjust to match!")
-                            .font(.system(size: 12, design: .rounded))
+                            .font(.system(size: 12))
+                        Text("Tap \"Edit\" to change your grade level. Questions will adjust to match!")
+                            .font(.system(size: 11, design: .rounded))
                             .foregroundColor(.secondary)
                     }
-                    .padding(12)
+                    .padding(10)
                     .background(
-                        RoundedRectangle(cornerRadius: 10)
+                        RoundedRectangle(cornerRadius: 8)
                             .fill(Color.yellow.opacity(0.08))
                     )
-
-                    // ── Actions ──
-                    Divider()
-                        .padding(.horizontal, -20)
-
-                    VStack(spacing: 8) {
-                        // Switch Player (always available)
-                        Button {
-                            onSwitchPlayer?()
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: "person.2.fill")
-                                Text("Switch Player")
-                            }
-                        }
-                        .buttonStyle(GameMenuButtonStyle(
-                            foreground: Color(red: 0.3, green: 0.5, blue: 0.8),
-                            background: Color(red: 0.3, green: 0.5, blue: 0.8).opacity(0.1)
-                        ))
-
-                        // Quit to Menu (in-game only)
-                        if isInGame {
-                            Button {
-                                onQuit?()
-                            } label: {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "rectangle.portrait.and.arrow.right")
-                                    Text("Quit to Menu")
-                                }
-                            }
-                            .buttonStyle(GameMenuButtonStyle(
-                                foreground: .secondary,
-                                background: Color.primary.opacity(0.05)
-                            ))
-                        }
-                    }
                 }
-                .padding(20)
+                .padding(16)
             }
         }
-        .frame(minWidth: 400, minHeight: isInGame ? 560 : 440)
+        .frame(minWidth: 400, minHeight: isInGame ? 480 : 300)
         .sheet(isPresented: $showEditSheet) {
             if let profile = profileManager.activeProfile {
                 ProfileCreateEditView(existingProfile: profile)
@@ -415,20 +416,20 @@ struct ProfileSheet: View {
 
     @ViewBuilder
     private func statBox(label: String, value: String, icon: String, color: Color) -> some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.title2)
+                .font(.system(size: 16))
                 .foregroundColor(color)
             Text(value)
-                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .font(.system(size: 16, weight: .bold, design: .rounded))
             Text(label)
-                .font(.system(size: 11, design: .rounded))
+                .font(.system(size: 10, design: .rounded))
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
+        .padding(.vertical, 10)
         .background(
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: 10)
                 .fill(Color.primary.opacity(0.05))
         )
     }
