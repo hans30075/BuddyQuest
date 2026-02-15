@@ -1,0 +1,686 @@
+================================================================================
+  BUDDYQUEST — AI ART GENERATION PROMPT GUIDE
+  Tool: PixelLab (pixellab.ai) recommended — $12/month
+  Cleanup: Aseprite ($20 one-time)
+  Last updated: 2026-02-07
+================================================================================
+TABLE OF CONTENTS
+-----------------
+1. GLOBAL STYLE RULES (read this first — apply to ALL prompts)
+2. TILE ASSETS (48x48 px each)
+3. PLAYER CHARACTER (48x64 px, 4 directions x 4 walk frames)
+4. BUDDY CHARACTERS (48x64 px each, 4 directions x 4 walk frames)
+5. NPC CHARACTERS (48x64 px each)
+6. ENVIRONMENT PROPS & DECORATIONS (various sizes)
+7. UI ELEMENTS (various sizes)
+8. FILE NAMING CONVENTIONS (for SpriteKit integration)
+9. EXPORT CHECKLIST
+
+
+================================================================================
+1. GLOBAL STYLE RULES — APPLY TO EVERY PROMPT
+================================================================================
+
+Add these keywords/instructions to EVERY prompt you submit:
+
+  "16-bit pixel art, top-down RPG perspective, bright and cheerful colors,
+   child-friendly cartoon style, clean pixel edges, transparent background,
+   no anti-aliasing, limited color palette (max 32 colors per sprite),
+   inspired by Stardew Valley and Pokémon gen 3-4 art style"
+
+Resolution rules:
+  - Generate at 3x size (e.g., 144x144 for a 48x48 tile) for best quality
+  - Downscale to target size in Aseprite using nearest-neighbor interpolation
+  - NEVER use bilinear/bicubic downscale — it blurs pixel art
+  - Export as PNG with transparency (alpha channel)
+  - SpriteKit expects @1x (48px), @2x (96px), @3x (144px) variants
+
+Color palette reference (use these exact colors for consistency):
+  - Grass green:    #72C059
+  - Path tan:       #C0A673
+  - Water blue:     #4D8DD9
+  - Wall brown:     #734552 (really a dark mauve-brown)
+  - Wood brown:     #A67340
+  - Stone gray:     #999999
+  - Dirt brown:     #8C6640
+  - Sand yellow:    #F2E6A6
+  - Snow white:     #F2F2FF
+  - Lab light gray: #D9D9E6
+  - Portal purple:  #B366FF
+  - Skin tone:      #FFD9BA
+  - Hair brown:     #472E1A
+  - Shirt blue:     #4785E6
+  - Pants navy:     #333F6B
+  - Shoe red:       #D13830
+
+Art style details:
+  - Characters have large heads (roughly 60-70% of body width)
+  - Eyes are large and expressive (anime-influenced but not full anime)
+  - Bodies are short and chibi-proportioned (head:body ratio ~1:1)
+  - Outlines are 1px dark (not black — use darkened version of fill color)
+  - Shading uses 2-3 tones per color area (base + shadow + optional highlight)
+  - No dithering — use flat color fills with clear tone boundaries
+  - All characters cast a small dark elliptical shadow beneath their feet
+
+
+================================================================================
+2. TILE ASSETS — 48x48 pixels each
+================================================================================
+
+Generate each tile at 144x144, downscale to 48x48.
+Tiles must be SEAMLESSLY TILEABLE (edges connect when placed side by side).
+
+--- FLOOR TILES ---
+
+PROMPT: grass
+  "16-bit pixel art, top-down view, grass ground tile, seamlessly tileable,
+   short green grass with subtle color variation, 2-3 shades of green,
+   base color #72C059, occasional tiny darker grass tuft detail,
+   no objects or obstacles, flat ground texture, transparent-free (fully opaque)"
+
+PROMPT: grass_flower
+  "16-bit pixel art, top-down view, grass tile with small pink wildflowers,
+   seamlessly tileable, base grass #72C059, tiny pink flowers #F2808C scattered,
+   2-3 flowers per tile, flat ground texture, fully opaque"
+
+PROMPT: path_stone
+  "16-bit pixel art, top-down view, stone path tile, seamlessly tileable,
+   cobblestone or flagstone pattern, base color #C0A673 warm tan,
+   subtle cracks between stones, 2-3 shades of tan/brown, fully opaque"
+
+PROMPT: path_dirt
+  "16-bit pixel art, top-down view, dirt path tile, seamlessly tileable,
+   packed earth with subtle pebble details, base color #8C6640,
+   2 shades of brown, occasional tiny stone, fully opaque"
+
+PROMPT: wood_floor
+  "16-bit pixel art, top-down view, wooden plank floor tile, seamlessly tileable,
+   horizontal wood planks with grain lines, base color #A67340 warm brown,
+   2-3 shades, visible plank edges, indoor floor for a cozy building, fully opaque"
+
+PROMPT: stone_floor
+  "16-bit pixel art, top-down view, stone tile floor, seamlessly tileable,
+   clean square stone tiles with thin mortar lines, base color #999999 medium gray,
+   2 shades of gray, indoor floor for castle or academy, fully opaque"
+
+PROMPT: sand
+  "16-bit pixel art, top-down view, sandy beach tile, seamlessly tileable,
+   soft sand texture with tiny shell or pebble details, base color #F2E6A6 warm yellow,
+   2 shades of sand, beach/desert feel, fully opaque"
+
+PROMPT: snow
+  "16-bit pixel art, top-down view, snow ground tile, seamlessly tileable,
+   white snow with very subtle blue shadow spots, base color #F2F2FF near-white,
+   clean and bright, occasional tiny sparkle dot, fully opaque"
+
+PROMPT: lab_floor
+  "16-bit pixel art, top-down view, laboratory floor tile, seamlessly tileable,
+   clean white/light gray linoleum or tiles, base color #D9D9E6,
+   subtle grid pattern, science lab feel, sterile and modern, fully opaque"
+
+--- WATER TILES ---
+
+PROMPT: water
+  "16-bit pixel art, top-down view, water tile, seamlessly tileable,
+   blue water with gentle ripple pattern, base color #4D8DD9,
+   2-3 shades of blue, small white highlight dots suggesting light on water,
+   calm pond or stream water, fully opaque"
+
+PROMPT: water_edge_north (also make: south, east, west, corners)
+  "16-bit pixel art, top-down view, water-to-grass edge tile, seamlessly tileable,
+   top half is grass #72C059, bottom half transitions into water #4D8DD9,
+   soft shoreline edge with a few pixels of wet sand #C0A673 between,
+   fully opaque"
+
+--- WALL TILES ---
+
+PROMPT: wall_stone
+  "16-bit pixel art, top-down view, stone wall tile, the wall is viewed from above
+   so it appears as a thick rectangular block, base color #734552 dark mauve-brown,
+   brick or stone block pattern, 2-3 shades, darker mortar lines,
+   clearly reads as impassable wall, fully opaque"
+
+PROMPT: wall_wood
+  "16-bit pixel art, top-down view, wooden wall tile seen from above,
+   dark wooden planks, base color #5C3A20 dark wood brown,
+   vertical plank lines with nail details, 2 shades, fully opaque"
+
+--- SPECIAL TILES ---
+
+PROMPT: portal
+  "16-bit pixel art, top-down view, magical portal tile, glowing purple energy,
+   base color #B366FF, swirling arcane pattern, bright center fading to edges,
+   sparkle particles, mystical doorway feel, fully opaque background with glow"
+
+PROMPT: sign
+  "16-bit pixel art, top-down view, wooden signpost, small wooden post with
+   a rectangular sign board on top, base color #B38C4D warm wood,
+   viewed from above, clean readable shape, transparent background"
+
+PROMPT: chest_closed
+  "16-bit pixel art, top-down view, treasure chest (closed), small wooden chest
+   with gold metal trim, base wood #8C6640, gold accents #CDA64D,
+   viewed slightly from above, clear chest shape, transparent background"
+
+PROMPT: chest_open
+  "16-bit pixel art, top-down view, treasure chest (open), same chest as closed
+   but lid is open revealing golden glow inside, sparkling contents,
+   transparent background"
+
+PROMPT: crystal
+  "16-bit pixel art, top-down view, glowing blue crystal cluster,
+   3-4 crystal points growing from ground, base color #99CCFF light blue,
+   bright white highlight on tips, subtle glow effect, transparent background"
+
+
+================================================================================
+3. PLAYER CHARACTER — 48x64 pixels (w x h)
+================================================================================
+
+Generate at 144x192, downscale to 48x64.
+Need: 4 directions (down/up/left/right) x 4 walk frames + 1 idle per direction = 20 frames total.
+
+IMPORTANT: Use PixelLab's "multi-directional character" feature if available.
+Feed the front-facing idle as style reference, then generate other directions.
+
+PROMPT: player_idle_down (GENERATE THIS FIRST — use as style reference for all others)
+  "16-bit pixel art, top-down RPG character sprite, front-facing (looking toward camera),
+   child adventurer, approximately 10 years old, friendly and cheerful expression,
+   chibi proportions (large head, small body), standing idle pose:
+
+   HEAD: Large round head taking up ~60% of sprite width, warm peach skin tone #FFD9BA,
+   big expressive eyes with white sclera and dark navy pupils #1E1938,
+   small white eye shine highlights, happy curved smile,
+   rosy pink cheeks (subtle blush), dark brown hair #472E1A in a fluffy puff style
+   on top with small side tufts
+
+   BODY: Bright blue t-shirt #4785E6 with slightly lighter collar detail,
+   short sleeves showing skin-tone arms, small round hands #FFD9BA
+
+   LEGS: Dark navy blue pants #333F6B, simple straight legs
+
+   FEET: Red sneakers #D13830, small and rounded
+
+   SHADOW: Small dark semi-transparent ellipse on ground beneath feet
+
+   Style: Clean pixel edges, 1px darkened outline (not black),
+   2-3 shading tones per area, no anti-aliasing, transparent background,
+   character centered in frame with ~4px padding on each side,
+   feet near bottom of frame, head near top"
+
+PROMPT: player_idle_up
+  "Same character as style reference, but facing AWAY from camera (back view),
+   back of head shows full dark brown hair #472E1A covering the head,
+   no face visible, same blue shirt from behind, same pants and red shoes,
+   transparent background"
+
+PROMPT: player_idle_left
+  "Same character as style reference, but facing LEFT (side/profile view),
+   one eye visible on the left side, nose bump on profile, hair tuft visible,
+   same blue shirt, arms at sides, same pants and red shoes,
+   body slightly angled to show depth, transparent background"
+
+PROMPT: player_idle_right
+  "Same character as style reference, but facing RIGHT (side/profile view),
+   mirror of the left-facing version, one eye visible on right side,
+   transparent background"
+
+PROMPT: player_walk_down_01 through player_walk_down_04
+  "Same front-facing character as style reference, walking animation frame [1/2/3/4]:
+   Frame 1: Left foot forward, right foot back, slight arm swing
+   Frame 2: Feet together, slight upward bounce (1-2px higher)
+   Frame 3: Right foot forward, left foot back, opposite arm swing
+   Frame 4: Feet together, return to normal height
+   Subtle body bounce of 1-2 pixels up on frames 2 and 4,
+   leg spread of 3-4 pixels between feet on frames 1 and 3,
+   transparent background"
+
+  (Repeat similar walk prompts for up/left/right directions)
+
+PROMPT: player_walk_up_01 through _04
+  "Same back-facing character, walking animation: [same frame descriptions as above
+   but showing the back view]"
+
+PROMPT: player_walk_left_01 through _04
+  "Same left-facing character, walking animation: [frame descriptions,
+   legs alternate forward/back in profile view, arms swing opposite to legs]"
+
+PROMPT: player_walk_right_01 through _04
+  "Same right-facing character, walking animation: [mirror of left walk]"
+
+
+================================================================================
+4. BUDDY CHARACTERS — 48x64 pixels each
+================================================================================
+
+Generate at 144x192, downscale to 48x64.
+Each buddy needs: 4 directions x (1 idle + 4 walk) = 20 frames.
+PLUS 4 emotion expressions (front-facing only): happy, thinking, excited, encouraging = 4 extra frames.
+Total per buddy: 24 frames.
+
+--- NOVA (Science Buddy) ---
+
+PROMPT: nova_idle_down (style reference for Nova)
+  "16-bit pixel art, top-down RPG companion character sprite, front-facing,
+   small cute creature/animal companion (NOT human — a small fantasy creature),
+   teal/cyan color theme, science-themed design:
+
+   BODY: Small round or oval body, teal color #00B4B4 as primary,
+   slightly darker teal belly or chest marking,
+   large curious eyes with round pupils (wide-eyed, inquisitive expression),
+   small smile showing curiosity
+
+   ACCESSORIES: Tiny round goggles pushed up on forehead (clear lenses, brass frame),
+   miniature white lab coat or vest over the body (only 3-4 px wide details),
+   the coat should read clearly even at small size
+
+   SIZE: Slightly smaller than the player character (~80% height),
+   chibi proportions, big head relative to body
+
+   DETAILS: Small stubby arms/paws, short legs or feet,
+   possibly a small antenna or tuft suggesting scientific curiosity,
+   1px outline in darkened teal, 2-3 shade tones,
+   small dark shadow ellipse on ground, transparent background"
+
+PROMPT: nova_emotion_thinking
+  "Same Nova character, front-facing, THINKING expression:
+   one hand/paw raised to chin, eyes looking slightly upward,
+   small thought bubble or question mark floating above head (2-3 pixels),
+   mouth in neutral 'hmm' shape, transparent background"
+
+PROMPT: nova_emotion_excited
+  "Same Nova character, front-facing, EXCITED expression:
+   arms/paws raised up, eyes extra wide and sparkling,
+   big open smile, small exclamation mark or star particles above head,
+   slight upward bounce pose (1px higher), transparent background"
+
+PROMPT: nova_emotion_happy
+  "Same Nova character, front-facing, HAPPY expression:
+   closed happy eyes (^_^ style), wide smile, arms relaxed at sides,
+   small heart or sparkle above head, warm cheerful pose, transparent background"
+
+PROMPT: nova_emotion_encouraging
+  "Same Nova character, front-facing, ENCOURAGING expression:
+   one arm/paw raised in thumbs-up or fist-pump gesture,
+   determined confident smile, eyes bright,
+   small star or sparkle near raised arm, transparent background"
+
+  (Generate walk frames for Nova using same pattern as player character)
+
+--- LEXIE (Language Arts Buddy) ---
+
+PROMPT: lexie_idle_down (style reference for Lexie)
+  "16-bit pixel art, top-down RPG companion character sprite, front-facing,
+   small cute fantasy creature companion, purple/lavender color theme,
+   literature and storytelling themed design:
+
+   BODY: Small round or oval body, purple #B464DC as primary color,
+   lighter lavender belly or chest, large expressive dreamy eyes,
+   gentle creative smile, slightly whimsical appearance
+
+   ACCESSORIES: Tiny book tucked under one arm (brown cover with gold detail),
+   small beret or pointed hat in darker purple,
+   possibly a tiny quill or pen tucked behind ear (1-2 px detail)
+
+   SIZE: ~80% of player height, chibi proportions,
+   1px outline in darkened purple, 2-3 shade tones,
+   small dark shadow ellipse on ground, transparent background"
+
+  (Generate 4 emotions + walk frames using same pattern as Nova)
+
+--- DIGIT (Math Buddy) ---
+
+PROMPT: digit_idle_down (style reference for Digit)
+  "16-bit pixel art, top-down RPG companion character sprite, front-facing,
+   small cute fantasy creature companion, blue/yellow color theme,
+   mathematics and logic themed design:
+
+   BODY: Small angular or geometric-inspired body shape (still cute, not sharp),
+   bright blue #508CFF as primary color, yellow #FFCC33 accent markings
+   (like geometric patterns or shapes on body — triangle, circle, square),
+   focused but friendly eyes, confident small smile
+
+   ACCESSORIES: Tiny abacus or calculator-like accessory on back or belt,
+   or small geometric crystal floating near body,
+   possibly tiny glasses (square-framed, not round)
+
+   SIZE: ~80% of player height, chibi proportions,
+   1px outline in darkened blue, 2-3 shade tones,
+   small dark shadow ellipse on ground, transparent background"
+
+  (Generate 4 emotions + walk frames using same pattern as Nova)
+
+--- HARMONY (Social Skills Buddy) ---
+
+PROMPT: harmony_idle_down (style reference for Harmony)
+  "16-bit pixel art, top-down RPG companion character sprite, front-facing,
+   small cute fantasy creature companion, pink/gold color theme,
+   friendship and cooperation themed design:
+
+   BODY: Soft rounded body shape, warm pink #FF8CB4 as primary color,
+   golden #FFD700 accent details (small heart shape on chest or forehead),
+   large gentle empathetic eyes, warm welcoming smile,
+   the most approachable and huggable of all the buddies
+
+   ACCESSORIES: Small ribbon or bow (gold colored),
+   possibly tiny friendship bracelet detail on wrist/paw,
+   soft flowing detail like a small scarf or cape (2-3 px)
+
+   SIZE: ~80% of player height, chibi proportions,
+   1px outline in darkened pink, 2-3 shade tones,
+   small dark shadow ellipse on ground, transparent background"
+
+  (Generate 4 emotions + walk frames using same pattern as Nova)
+
+
+================================================================================
+5. NPC CHARACTERS — 48x64 pixels each
+================================================================================
+
+Generate at 144x192, downscale to 48x64.
+NPCs need: 4 direction idles only (no walk animation needed initially).
+
+PROMPT: npc_pip (Pip the Guide — hub world tutorial NPC)
+  "16-bit pixel art, top-down RPG NPC character sprite, front-facing,
+   friendly elderly owl or wise bird character, tutorial guide role:
+
+   BODY: Small plump owl or bird, warm brown #8B6B4A feathers,
+   lighter tan chest, wise but friendly large eyes behind tiny round spectacles,
+   small happy beak/smile, scholarly appearance
+
+   ACCESSORIES: Tiny pointed wizard/scholar hat in dark blue,
+   small scroll or map tucked under wing,
+   possibly a tiny lantern hanging from a staff (if space allows)
+
+   PERSONALITY: Wise, helpful, grandfatherly warmth,
+   the first character players meet, should feel safe and trustworthy
+
+   SIZE: Same height as player (48x64), chibi proportions,
+   1px outline, 2-3 shade tones, shadow, transparent background"
+
+PROMPT: npc_merchant
+  "16-bit pixel art, top-down RPG NPC, front-facing,
+   friendly fox or raccoon shopkeeper character:
+
+   Wearing a small apron, warm colors (orange/brown),
+   cheerful merchant expression, tiny sack or pouch at side,
+   standing behind implied counter, welcoming pose,
+   48x64 pixel frame, transparent background"
+
+PROMPT: npc_quest_giver (generic template — recolor for different zones)
+  "16-bit pixel art, top-down RPG NPC, front-facing,
+   friendly animal or fantasy creature character,
+   [ZONE COLOR] as primary color (replace per zone),
+   wearing zone-appropriate outfit:
+   - Word Forest: green woodland outfit, book or scroll
+   - Number Peaks: blue mountain outfit, compass or ruler
+   - Science Lab: white lab coat, beaker or magnifying glass
+   - Teamwork Arena: orange sports/adventure outfit, trophy or flag
+
+   Clear friendly expression, approachable, helpful pose,
+   48x64 pixel frame, transparent background"
+
+
+================================================================================
+6. ENVIRONMENT PROPS & DECORATIONS — various sizes
+================================================================================
+
+These are placed ON TOP of floor tiles. All need transparent backgrounds.
+Generate at 3x, downscale.
+
+PROMPT: tree_oak (48x64 — same as character height, placed on tile)
+  "16-bit pixel art, top-down view, single oak tree seen from above,
+   round leafy green canopy #339933, visible brown trunk #5C3A20 at base,
+   2-3 shades of green in canopy, small shadow beneath,
+   tree fills most of the 48x48 base but canopy extends upward to 64px height,
+   transparent background"
+
+PROMPT: tree_pine (48x64)
+  "16-bit pixel art, top-down view, single pine/evergreen tree,
+   darker green #2D7A2D, triangular/conical shape from above,
+   thin brown trunk visible at base, transparent background"
+
+PROMPT: bookshelf (48x48 — fits on one tile)
+  "16-bit pixel art, top-down view, wooden bookshelf seen from above,
+   dark wood frame #804D0D, colorful book spines visible (red, blue, green, gold),
+   3-4 books of different heights, clearly reads as a bookshelf,
+   indoor furniture for a library or study room, transparent background"
+
+PROMPT: table_wooden (48x48)
+  "16-bit pixel art, top-down view, small wooden table seen from above,
+   rectangular wooden table #994C33, visible wood grain,
+   slightly darker legs visible at corners, clean simple design,
+   indoor furniture, transparent background"
+
+PROMPT: table_with_items (48x48)
+  "16-bit pixel art, top-down view, wooden table with items on it,
+   same table as above but with 2-3 tiny items: a book, a candle, a cup,
+   items are very small (3-5px each), transparent background"
+
+PROMPT: flower_pink (48x48)tile
+  "16-bit pixel art, top-down view, small pink flower patch on ground,
+   2-3 simple pink flowers #F2808C with tiny green stems,
+   flowers are small (8-12px each), ground beneath is transparent,
+   decorative ground detail, transparent background"
+
+PROMPT: rock_large (48x48)
+  "16-bit pixel art, top-down view, large gray boulder seen from above,
+   rounded rock shape #808080, 2-3 shades of gray for depth,
+   small shadow on one side, impassable obstacle, transparent background"
+
+PROMPT: rock_small (48x48)
+  "16-bit pixel art, top-down view, cluster of 2-3 small gray pebbles,
+   #999999 gray, much smaller than the large rock,
+   decorative ground detail, walkable (not obstacle), transparent background"
+
+PROMPT: fountain (96x96 — 2x2 tiles)
+  "16-bit pixel art, top-down view, ornamental stone water fountain,
+   circular basin with water #4D8DD9, stone rim #999999,
+   small water jet or ripples in center, 2x2 tile size (96x96 pixels at 1x),
+   centerpiece for a courtyard, transparent background"
+
+PROMPT: lab_equipment (48x48)
+  "16-bit pixel art, top-down view, science lab table with equipment,
+   white/gray table surface, tiny beakers with colored liquid (green, blue),
+   small microscope shape, test tube rack, science lab decoration,
+   transparent background"
+
+PROMPT: banner_zone (16x48 — tall narrow wall decoration)
+  "16-bit pixel art, vertical wall banner/flag, hanging from top,
+   [ZONE COLOR] fabric with [ZONE SYMBOL]:
+   - Word Forest: green banner with book/quill symbol
+   - Number Peaks: blue banner with mountain/number symbol
+   - Science Lab: purple banner with atom/beaker symbol
+   - Teamwork Arena: orange banner with handshake/star symbol
+   Simple 2-3 color design, transparent background"
+
+
+================================================================================
+7. UI ELEMENTS
+================================================================================
+
+UI is rendered by SwiftUI, so these are standard PNGs (not pixel art style).
+Generate at 3x resolution for crisp display on all devices.
+
+PROMPT: icon_xp_star (72x72 at 3x → 24x24 at 1x)
+  "Clean flat vector-style game icon, golden star shape,
+   bright gold #FFC832 with subtle orange gradient,
+   thin darker gold outline, represents XP/experience points,
+   simple and readable at small sizes, transparent background"
+
+PROMPT: icon_heart (72x72)
+  "Clean flat vector-style game icon, red heart shape,
+   bright red #FF5050, simple health/life indicator,
+   small white highlight for depth, transparent background"
+
+PROMPT: icon_coin (72x72)
+  "Clean flat vector-style game icon, gold coin,
+   circular coin with subtle embossed star or B symbol,
+   gold #CDA64D with darker edge, slight shine highlight,
+   represents in-game currency, transparent background"
+
+PROMPT: icon_key (72x72)
+  "Clean flat vector-style game icon, ornate golden key,
+   old-fashioned skeleton key shape, gold #CDA64D,
+   represents unlocking doors or zones, transparent background"
+
+PROMPT: icon_book_[subject] (72x72, one per subject)
+  "Clean flat vector-style game icon, book shape with [SUBJECT] theme:
+   - Language Arts: purple book with quill on cover
+   - Math: blue book with number/pi symbol on cover
+   - Science: teal book with atom on cover
+   - Social: pink book with heart on cover
+   Simple readable design, transparent background"
+
+PROMPT: button_frame (scalable 9-patch, 150x54 base)
+  "16-bit pixel art, game UI button frame, rounded rectangle shape,
+   wooden or stone border style, inner area is a solid lighter color,
+   designed as a 9-slice/9-patch (corners and edges are distinct from center),
+   warm brown wood frame or blue stone frame,
+   no text — just the empty button shape, transparent background"
+
+PROMPT: dialogue_box_frame (scalable 9-patch, 300x100 base)
+  "16-bit pixel art, game UI dialogue box frame, rounded rectangle,
+   dark semi-transparent background (dark blue #1A1A33 at ~90% opacity),
+   thin decorative border in lighter blue or gold,
+   designed as a 9-slice (stretchable center, fixed corners),
+   space for character portrait on left side (48x48 area),
+   RPG dialogue box style, transparent outer area"
+
+PROMPT: portrait_frame (60x60)
+  "16-bit pixel art, small square portrait frame for dialogue box,
+   ornate but simple border, gold or dark wood frame,
+   inner area is transparent (character portrait goes inside),
+   4-5px wide frame border, transparent background"
+
+
+================================================================================
+8. FILE NAMING CONVENTIONS — CRITICAL FOR SPRITEKIT
+================================================================================
+
+Name every exported PNG file using this exact pattern.
+SpriteKit loads textures by filename, so consistency is essential.
+
+TILES (place in Assets/Tiles/ folder):
+  tile_grass.png
+  tile_grass_flower.png
+  tile_path_stone.png
+  tile_path_dirt.png
+  tile_wood_floor.png
+  tile_stone_floor.png
+  tile_sand.png
+  tile_snow.png
+  tile_lab_floor.png
+  tile_water.png
+  tile_water_edge_n.png / _s / _e / _w / _ne / _nw / _se / _sw
+  tile_wall_stone.png
+  tile_wall_wood.png
+  tile_portal.png
+  tile_sign.png
+  tile_chest_closed.png
+  tile_chest_open.png
+  tile_crystal.png
+
+PLAYER (place in Assets/Player/ folder):
+  player_idle_down.png
+  player_idle_up.png
+  player_idle_left.png
+  player_idle_right.png
+  player_walk_down_01.png through player_walk_down_04.png
+  player_walk_up_01.png   through player_walk_up_04.png
+  player_walk_left_01.png through player_walk_left_04.png
+  player_walk_right_01.png through player_walk_right_04.png
+
+BUDDIES (place in Assets/Buddies/[name]/ folder):
+  nova_idle_down.png / _up / _left / _right
+  nova_walk_down_01.png through _04  (repeat for up/left/right)
+  nova_emotion_happy.png
+  nova_emotion_thinking.png
+  nova_emotion_excited.png
+  nova_emotion_encouraging.png
+  (same pattern for lexie_, digit_, harmony_)
+
+NPCS (place in Assets/NPCs/ folder):
+  npc_pip_down.png / _up / _left / _right
+  npc_merchant_down.png / _up / _left / _right
+  npc_quest_[zone]_down.png (e.g., npc_quest_forest_down.png)
+
+PROPS (place in Assets/Props/ folder):
+  prop_tree_oak.png
+  prop_tree_pine.png
+  prop_bookshelf.png
+  prop_table.png
+  prop_table_items.png
+  prop_flower_pink.png
+  prop_rock_large.png
+  prop_rock_small.png
+  prop_fountain.png
+  prop_lab_equipment.png
+  prop_banner_forest.png / _peaks / _lab / _arena
+
+UI (place in Assets/UI/ folder):
+  ui_icon_xp.png
+  ui_icon_heart.png
+  ui_icon_coin.png
+  ui_icon_key.png
+  ui_icon_book_language.png / _math / _science / _social
+  ui_button_frame.png
+  ui_dialogue_frame.png
+  ui_portrait_frame.png
+
+For @2x and @3x variants, append the suffix:
+  player_idle_down.png      (1x — 48x64)
+  player_idle_down@2x.png   (2x — 96x128)
+  player_idle_down@3x.png   (3x — 144x192)
+
+
+================================================================================
+9. EXPORT CHECKLIST — VERIFY BEFORE IMPORTING TO XCODE
+================================================================================
+
+For EVERY exported asset, verify:
+
+  [ ] PNG format with alpha transparency
+  [ ] Correct pixel dimensions (no off-by-one)
+  [ ] No stray pixels outside the sprite boundary
+  [ ] No anti-aliased (blurry) edges — all edges are crisp 1px steps
+  [ ] Color palette matches the global palette above
+  [ ] Character sprites are CENTERED in the frame horizontally
+  [ ] Character feet are near the BOTTOM of the frame (with ~2px padding)
+  [ ] Character heads are near the TOP of the frame (with ~2px padding)
+  [ ] Walk animation frames have CONSISTENT body size (no size flickering)
+  [ ] Walk animation frames have feet at the SAME Y position when grounded
+  [ ] Tiles connect seamlessly when placed side-by-side (check all 4 edges)
+  [ ] Shadow ellipse is included and positioned consistently across all frames
+  [ ] Filename matches the naming convention exactly (case-sensitive)
+  [ ] @1x, @2x, @3x variants are all present and correctly sized
+
+Quick test in Aseprite:
+  1. Open all 4 walk frames for one direction as animation
+  2. Play at 6-7 FPS — should look like smooth walking, no jitter
+  3. Place 4 grass tiles in a 2x2 grid — edges should connect seamlessly
+  4. Place character on top of tiles — character should be clearly visible
+     against the background with good contrast
+
+
+================================================================================
+  END OF PROMPT GUIDE
+  Total assets needed for initial art pass:
+    Tiles:     ~25 individual tiles
+    Player:    20 frames (4 dirs x 5 frames)
+    Buddies:   24 frames x 4 buddies = 96 frames
+    NPCs:      4-8 frames per NPC x 3 NPCs = ~16 frames
+    Props:     ~12 individual props
+    UI:        ~12 icons/frames
+    -----------------------------------------
+    TOTAL:     ~180 individual PNG files
+
+  Estimated time with PixelLab:
+    - Tiles: 1-2 hours (batch generation + seamless fix)
+    - Player: 2-3 hours (establish style + all frames)
+    - Each buddy: 2-3 hours
+    - NPCs: 1-2 hours
+    - Props: 1-2 hours
+    - UI: 1 hour
+    TOTAL: ~15-20 hours of art generation + cleanup
+================================================================================

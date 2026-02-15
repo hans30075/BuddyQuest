@@ -1,0 +1,85 @@
+name: BuddyQuest
+options:
+  bundleIdPrefix: com.buddyquest
+  deploymentTarget:
+    iOS: "17.0"
+    macOS: "14.0"
+  xcodeVersion: "16.0"
+  generateEmptyDirectories: true
+
+packages:
+  BuddyQuestKit:
+    path: ./BuddyQuestKit
+
+targets:
+  BuddyQuest-iOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: BuddyQuestApp
+      - path: BuddyQuestUI
+      - path: BuddyQuestApp/Art
+        type: folder
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.buddyquest.app
+        PRODUCT_NAME: BuddyQuest
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        INFOPLIST_KEY_CFBundleDisplayName: BuddyQuest
+        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.educational-games"
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+      configs:
+        debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+        release:
+          SWIFT_OPTIMIZATION_LEVEL: -O
+    dependencies:
+      - package: BuddyQuestKit
+    info:
+      path: BuddyQuestApp/Info.plist
+      properties:
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+
+  BuddyQuest-macOS:
+    type: application
+    platform: macOS
+    sources:
+      - path: BuddyQuestApp
+      - path: BuddyQuestUI
+      - path: BuddyQuestApp/Art
+        type: folder
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.buddyquest.app
+        PRODUCT_NAME: BuddyQuest
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        INFOPLIST_KEY_CFBundleDisplayName: BuddyQuest
+        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.educational-games"
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: YES
+      configs:
+        debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+        release:
+          SWIFT_OPTIMIZATION_LEVEL: -O
+    dependencies:
+      - package: BuddyQuestKit
+    entitlements:
+      path: BuddyQuestApp/macOS/BuddyQuest.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
