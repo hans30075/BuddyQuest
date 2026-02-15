@@ -22,10 +22,6 @@ public struct InputState {
     public var held: Set<InputAction> = []
     public var justReleased: Set<InputAction> = []
 
-    /// Characters typed this frame (for text input mode, e.g. fill-in-blank).
-    /// Includes printable characters; backspace is represented as "\u{08}".
-    public var typedCharacters: [Character] = []
-
     public func isPressed(_ action: InputAction) -> Bool {
         justPressed.contains(action)
     }
@@ -44,17 +40,10 @@ public struct InputState {
 public final class InputManager {
     public private(set) var state = InputState()
 
-    /// When true, keyboard character input is buffered into `typedCharacters`
-    /// instead of being consumed as game actions. Set by FillInBlankChallenge.
-    public var isTextInputActive: Bool = false
-
     // Keyboard tracking
     private var keysDown: Set<UInt16> = []
     private var keysPressed: Set<UInt16> = []
     private var keysReleased: Set<UInt16> = []
-
-    // Text input buffer (characters typed this frame)
-    private var textInputBuffer: [Character] = []
 
     // Virtual joystick (iOS)
     private var virtualJoystickDirection: CGPoint = .zero
@@ -113,13 +102,7 @@ public final class InputManager {
         newState.movement = movement
 
         // Compute button states
-        // When text input is active, suppress letter-key game actions (WASD, E, P, I, Q)
-        // so they only feed the text buffer. Arrow keys, Return, Escape still work.
-        let suppressedKeyCodes: Set<UInt16> = isTextInputActive
-            ? [0x0D, 0x01, 0x00, 0x02, 0x0E, 0x23, 0x22, 0x0C, 0x31]  // W, S, A, D, E, P, I, Q, Space
-            : []
         for (keyCode, action) in Self.keyMap {
-            if suppressedKeyCodes.contains(keyCode) { continue }
             if keysPressed.contains(keyCode) {
                 newState.justPressed.insert(action)
             }
@@ -136,16 +119,12 @@ public final class InputManager {
             newState.justPressed.insert(action)
         }
 
-        // Transfer text input buffer
-        newState.typedCharacters = textInputBuffer
-
         state = newState
 
         // Clear per-frame events
         keysPressed.removeAll()
         keysReleased.removeAll()
         virtualButtonsPressed.removeAll()
-        textInputBuffer.removeAll()
     }
 
     // MARK: - Keyboard Input (macOS / hardware keyboard on iPad)
@@ -155,26 +134,6 @@ public final class InputManager {
             keysPressed.insert(keyCode)
         }
         keysDown.insert(keyCode)
-    }
-
-    /// Extended keyDown that also captures typed characters for text input mode.
-    /// Call this instead of `keyDown(keyCode:)` when `NSEvent.characters` is available.
-    public func keyDown(keyCode: UInt16, characters: String?) {
-        keyDown(keyCode: keyCode)
-
-        // Buffer characters for text input when active
-        if isTextInputActive, let chars = characters {
-            for char in chars {
-                // Filter: allow letters, digits, space, punctuation useful for answers
-                if char.isLetter || char.isNumber || char == " " || char == "." || char == "-" || char == "," || char == "'" {
-                    textInputBuffer.append(char)
-                }
-            }
-            // Handle backspace (keyCode 0x33)
-            if keyCode == 0x33 {
-                textInputBuffer.append(Character("\u{08}"))  // backspace marker
-            }
-        }
     }
 
     public func keyUp(keyCode: UInt16) {

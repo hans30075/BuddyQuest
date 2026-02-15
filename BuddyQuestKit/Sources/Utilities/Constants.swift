@@ -35,7 +35,6 @@ public enum GameConstants {
     public static let challengeRoundSize: Int = 5
     public static let perQuestionFeedbackDuration: TimeInterval = 1.2
     public static let trueFalseTimerSeconds: TimeInterval = 20
-    public static let fillBlankTimerSeconds: TimeInterval = 45
     public static let orderingTimerSeconds: TimeInterval = 45
     public static let matchingTimerSeconds: TimeInterval = 45
 

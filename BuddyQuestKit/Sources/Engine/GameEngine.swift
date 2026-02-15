@@ -598,7 +598,7 @@ public final class GameEngine: SKScene {
             challenge.onBuddyHint = { [weak self] hint in
                 self?.activeBuddy?.say(hint, duration: 4.0)
             }
-            challenge.inputManager = self.inputManager
+
             self.challengeEngine.startChallengeAfterLoading(challenge)
             return
         }
@@ -640,7 +640,7 @@ public final class GameEngine: SKScene {
             challenge.onBuddyHint = { [weak self] hint in
                 self?.activeBuddy?.say(hint, duration: 4.0)
             }
-            challenge.inputManager = self.inputManager
+
             self.challengeEngine.startChallengeAfterLoading(challenge)
         } else if let bankQuestions = bankManager.drawQuestions(
             subject: subject,
@@ -1423,7 +1423,7 @@ public final class GameEngine: SKScene {
 
     #if os(macOS)
     public override func keyDown(with event: NSEvent) {
-        inputManager.keyDown(keyCode: event.keyCode, characters: event.characters)
+        inputManager.keyDown(keyCode: event.keyCode)
     }
 
     public override func keyUp(with event: NSEvent) {

@@ -12,10 +12,10 @@ public enum NewTypeQuestionBank {
     /// All new-type questions for a given subject.
     public static func questions(for subject: Subject) -> [Question] {
         switch subject {
-        case .math:       return mathTrueFalse + mathFillInBlank + mathOrdering + mathMatching
-        case .languageArts: return elaTrueFalse + elaFillInBlank + elaOrdering + elaMatching
-        case .science:    return scienceTrueFalse + scienceFillInBlank + scienceOrdering + scienceMatching
-        case .social:     return socialTrueFalse + socialFillInBlank + socialOrdering + socialMatching
+        case .math:       return mathTrueFalse + mathOrdering + mathMatching
+        case .languageArts: return elaTrueFalse + elaOrdering + elaMatching
+        case .science:    return scienceTrueFalse + scienceOrdering + scienceMatching
+        case .social:     return socialTrueFalse + socialOrdering + socialMatching
         }
     }
 
@@ -66,61 +66,6 @@ public enum NewTypeQuestionBank {
             payload: .trueFalse(correctAnswer: true),
             explanation: "'Centi' means one hundredth, so 100 centimeters = 1 meter.",
             subject: .math, difficulty: .easy, gradeLevel: .second
-        ),
-    ]
-
-    // MARK: Math — Fill-in-the-Blank
-
-    private static let mathFillInBlank: [Question] = [
-        Question(
-            questionText: "What is the answer?",
-            payload: .fillInBlank(
-                prompt: "8 × ___ = 56",
-                acceptedAnswers: ["7"],
-                isCaseSensitive: false
-            ),
-            explanation: "8 × 7 = 56.",
-            subject: .math, difficulty: .easy, gradeLevel: .third
-        ),
-        Question(
-            questionText: "What is the answer?",
-            payload: .fillInBlank(
-                prompt: "15 + 27 = ___",
-                acceptedAnswers: ["42"],
-                isCaseSensitive: false
-            ),
-            explanation: "15 + 27 = 42. You can add 15 + 25 = 40, then add 2 more.",
-            subject: .math, difficulty: .easy, gradeLevel: .second
-        ),
-        Question(
-            questionText: "What is 15% of 200?",
-            payload: .fillInBlank(
-                prompt: "15% of 200 = ___",
-                acceptedAnswers: ["30"],
-                isCaseSensitive: false
-            ),
-            explanation: "15% of 200 = 0.15 × 200 = 30.",
-            subject: .math, difficulty: .hard, gradeLevel: .sixth
-        ),
-        Question(
-            questionText: "What is the answer?",
-            payload: .fillInBlank(
-                prompt: "Half of 24 is ___",
-                acceptedAnswers: ["12"],
-                isCaseSensitive: false
-            ),
-            explanation: "24 ÷ 2 = 12.",
-            subject: .math, difficulty: .beginner, gradeLevel: .second
-        ),
-        Question(
-            questionText: "How many sides does a hexagon have?",
-            payload: .fillInBlank(
-                prompt: "A hexagon has ___ sides.",
-                acceptedAnswers: ["6", "six"],
-                isCaseSensitive: false
-            ),
-            explanation: "'Hex' means six, so a hexagon has 6 sides.",
-            subject: .math, difficulty: .easy, gradeLevel: .third
         ),
     ]
 
@@ -217,51 +162,6 @@ public enum NewTypeQuestionBank {
             payload: .trueFalse(correctAnswer: false),
             explanation: "A synonym means the same or nearly the same. An antonym means the opposite!",
             subject: .languageArts, difficulty: .easy, gradeLevel: .third
-        ),
-    ]
-
-    // MARK: ELA — Fill-in-the-Blank
-
-    private static let elaFillInBlank: [Question] = [
-        Question(
-            questionText: "Fill in the blank.",
-            payload: .fillInBlank(
-                prompt: "The opposite of 'happy' is ___",
-                acceptedAnswers: ["sad", "unhappy"],
-                isCaseSensitive: false
-            ),
-            explanation: "'Sad' and 'unhappy' are antonyms (opposites) of 'happy'.",
-            subject: .languageArts, difficulty: .easy, gradeLevel: .second
-        ),
-        Question(
-            questionText: "Fill in the blank with the correct punctuation mark.",
-            payload: .fillInBlank(
-                prompt: "What is your name___",
-                acceptedAnswers: ["?"],
-                isCaseSensitive: false
-            ),
-            explanation: "Questions always end with a question mark (?).",
-            subject: .languageArts, difficulty: .beginner, gradeLevel: .first
-        ),
-        Question(
-            questionText: "What is the plural form?",
-            payload: .fillInBlank(
-                prompt: "One child, two ___",
-                acceptedAnswers: ["children"],
-                isCaseSensitive: false
-            ),
-            explanation: "'Children' is the plural of 'child' — it's an irregular plural!",
-            subject: .languageArts, difficulty: .medium, gradeLevel: .third
-        ),
-        Question(
-            questionText: "Fill in the blank with the correct contraction.",
-            payload: .fillInBlank(
-                prompt: "do + not = ___",
-                acceptedAnswers: ["don't", "dont"],
-                isCaseSensitive: false
-            ),
-            explanation: "'Do not' contracts to 'don't'.",
-            subject: .languageArts, difficulty: .easy, gradeLevel: .second
         ),
     ]
 
@@ -366,51 +266,6 @@ public enum NewTypeQuestionBank {
         ),
     ]
 
-    // MARK: Science — Fill-in-the-Blank
-
-    private static let scienceFillInBlank: [Question] = [
-        Question(
-            questionText: "Fill in the blank.",
-            payload: .fillInBlank(
-                prompt: "Water freezes at ___ degrees Celsius.",
-                acceptedAnswers: ["0", "zero"],
-                isCaseSensitive: false
-            ),
-            explanation: "Water freezes at 0°C (32°F).",
-            subject: .science, difficulty: .easy, gradeLevel: .third
-        ),
-        Question(
-            questionText: "Fill in the blank.",
-            payload: .fillInBlank(
-                prompt: "The closest star to Earth is the ___.",
-                acceptedAnswers: ["sun", "Sun"],
-                isCaseSensitive: false
-            ),
-            explanation: "The Sun is our closest star, about 93 million miles away!",
-            subject: .science, difficulty: .easy, gradeLevel: .third
-        ),
-        Question(
-            questionText: "Fill in the blank.",
-            payload: .fillInBlank(
-                prompt: "Humans have ___ bones in their body.",
-                acceptedAnswers: ["206"],
-                isCaseSensitive: false
-            ),
-            explanation: "An adult human body has 206 bones.",
-            subject: .science, difficulty: .hard, gradeLevel: .fifth
-        ),
-        Question(
-            questionText: "Fill in the blank.",
-            payload: .fillInBlank(
-                prompt: "The process by which plants make food is called ___.",
-                acceptedAnswers: ["photosynthesis"],
-                isCaseSensitive: false
-            ),
-            explanation: "Photosynthesis is how plants convert sunlight into energy!",
-            subject: .science, difficulty: .medium, gradeLevel: .fourth
-        ),
-    ]
-
     // MARK: Science — Ordering
 
     private static let scienceOrdering: [Question] = [
@@ -504,41 +359,6 @@ public enum NewTypeQuestionBank {
             payload: .trueFalse(correctAnswer: true),
             explanation: "Taking turns makes sure everyone gets a chance to participate!",
             subject: .social, difficulty: .beginner, gradeLevel: .first
-        ),
-    ]
-
-    // MARK: Social — Fill-in-the-Blank
-
-    private static let socialFillInBlank: [Question] = [
-        Question(
-            questionText: "Fill in the blank.",
-            payload: .fillInBlank(
-                prompt: "When you accidentally hurt someone, you should say ___.",
-                acceptedAnswers: ["sorry", "I'm sorry", "im sorry"],
-                isCaseSensitive: false
-            ),
-            explanation: "Saying 'sorry' shows that you care about other people's feelings.",
-            subject: .social, difficulty: .beginner, gradeLevel: .first
-        ),
-        Question(
-            questionText: "Fill in the blank.",
-            payload: .fillInBlank(
-                prompt: "When someone does something nice for you, you should say ___.",
-                acceptedAnswers: ["thank you", "thanks"],
-                isCaseSensitive: false
-            ),
-            explanation: "Saying 'thank you' shows gratitude and makes people feel appreciated!",
-            subject: .social, difficulty: .beginner, gradeLevel: .kindergarten
-        ),
-        Question(
-            questionText: "Fill in the blank.",
-            payload: .fillInBlank(
-                prompt: "Taking deep ___ can help you calm down when you're upset.",
-                acceptedAnswers: ["breaths", "breath"],
-                isCaseSensitive: false
-            ),
-            explanation: "Deep breathing is a great calming strategy!",
-            subject: .social, difficulty: .easy, gradeLevel: .second
         ),
     ]
 

@@ -6,7 +6,6 @@ import Foundation
 public enum QuestionType: String, Codable, CaseIterable, Sendable {
     case multipleChoice
     case trueFalse
-    case fillInBlank
     case ordering
     case matching
 }
@@ -22,13 +21,6 @@ public enum QuestionPayload: Sendable {
 
     /// Binary true/false statement
     case trueFalse(correctAnswer: Bool)
-
-    /// Prompt with a blank; player types the answer
-    case fillInBlank(
-        prompt: String,              // e.g. "8 × ___ = 56"
-        acceptedAnswers: [String],   // e.g. ["7"] — multiple accepted spellings
-        isCaseSensitive: Bool
-    )
 
     /// Arrange items in the correct order
     case ordering(
@@ -52,7 +44,6 @@ extension QuestionPayload: Codable {
         case type
         case options, correctIndex
         case correctAnswer
-        case prompt, acceptedAnswers, isCaseSensitive
         case items, correctOrder
         case leftItems, rightItems, correctMapping
     }
@@ -68,12 +59,6 @@ extension QuestionPayload: Codable {
         case .trueFalse(let correctAnswer):
             try container.encode("trueFalse", forKey: .type)
             try container.encode(correctAnswer, forKey: .correctAnswer)
-
-        case .fillInBlank(let prompt, let acceptedAnswers, let isCaseSensitive):
-            try container.encode("fillInBlank", forKey: .type)
-            try container.encode(prompt, forKey: .prompt)
-            try container.encode(acceptedAnswers, forKey: .acceptedAnswers)
-            try container.encode(isCaseSensitive, forKey: .isCaseSensitive)
 
         case .ordering(let items, let correctOrder):
             try container.encode("ordering", forKey: .type)
@@ -101,12 +86,6 @@ extension QuestionPayload: Codable {
         case "trueFalse":
             let correctAnswer = try container.decode(Bool.self, forKey: .correctAnswer)
             self = .trueFalse(correctAnswer: correctAnswer)
-
-        case "fillInBlank":
-            let prompt = try container.decode(String.self, forKey: .prompt)
-            let acceptedAnswers = try container.decode([String].self, forKey: .acceptedAnswers)
-            let isCaseSensitive = try container.decodeIfPresent(Bool.self, forKey: .isCaseSensitive) ?? false
-            self = .fillInBlank(prompt: prompt, acceptedAnswers: acceptedAnswers, isCaseSensitive: isCaseSensitive)
 
         case "ordering":
             let items = try container.decode([String].self, forKey: .items)
@@ -145,7 +124,6 @@ public struct Question: Sendable {
         switch payload {
         case .multipleChoice: return .multipleChoice
         case .trueFalse: return .trueFalse
-        case .fillInBlank: return .fillInBlank
         case .ordering: return .ordering
         case .matching: return .matching
         }

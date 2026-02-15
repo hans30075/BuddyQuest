@@ -4,7 +4,7 @@ import SpriteKit
 // MARK: - Mixed Round Challenge (Multi-Type Orchestrator)
 
 /// A challenge round that sequences through questions of MIXED types
-/// (multipleChoice, trueFalse, fillInBlank, ordering, matching) in a single round.
+/// (multipleChoice, trueFalse, ordering, matching) in a single round.
 ///
 /// MixedRoundChallenge is purely an orchestrator -- it has no UI of its own.
 /// For each question, it instantiates the appropriate single-question sub-challenge
@@ -47,9 +47,6 @@ public final class MixedRoundChallenge: Challenge, RoundChallenge {
 
     /// Callback to show a buddy speech bubble with a hint
     public var onBuddyHint: ((String) -> Void)?
-
-    /// Reference to InputManager for text input (fill-in-blank keyboard support)
-    public weak var inputManager: InputManager?
 
     // MARK: - UI References
 
@@ -118,7 +115,6 @@ public final class MixedRoundChallenge: Challenge, RoundChallenge {
     // MARK: - Teardown
 
     public func teardown() {
-        inputManager?.isTextInputActive = false
         currentSubChallenge?.teardown()
         currentSubChallenge = nil
         parentNode = nil
@@ -187,11 +183,6 @@ public final class MixedRoundChallenge: Challenge, RoundChallenge {
             perQuestionCorrectionInfo.append(nil)
         }
 
-        // Deactivate text input if the sub-challenge was fill-in-blank
-        if currentSubChallenge is FillInBlankChallenge {
-            inputManager?.isTextInputActive = false
-        }
-
         // Tear down the current sub-challenge
         currentSubChallenge?.teardown()
         currentSubChallenge = nil
@@ -230,17 +221,6 @@ public final class MixedRoundChallenge: Challenge, RoundChallenge {
                 hasSecondChance: hasSecondChance
             )
             challenge.onBuddyHint = onBuddyHint
-            currentSubChallenge = challenge
-
-        case .fillInBlank:
-            let challenge = FillInBlankChallenge(
-                questions: [question],
-                showBuddyHints: showBuddyHints,
-                hasSecondChance: hasSecondChance
-            )
-            challenge.onBuddyHint = onBuddyHint
-            challenge.inputManager = inputManager
-            inputManager?.isTextInputActive = true
             currentSubChallenge = challenge
 
         case .ordering:
